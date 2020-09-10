@@ -1,1 +1,103 @@
 
+package com.ensimtest.tests.reseller;
+
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class NewPracticeClass {
+    WebDriver driver;
+
+    @BeforeClass
+    public void launchBrowser()
+    {
+        System.setProperty("webdriver.chrome.driver", "path of chrome driver"); // please specify your path for the chrome driver
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://www.flipkart.com");
+    }
+
+    @Test()
+    public void searchIphones() throws InterruptedException {
+        WebDriverWait wait = new WebDriverWait(driver, 40);
+
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@class='_2AkmmA _29YdH8']")));
+            WebElement loginDialogCloseButton = driver.findElement(By.xpath("//button[@class='_2AkmmA _29YdH8']"));
+            loginDialogCloseButton.click();
+        } catch (Exception e) {
+            System.out.println("Login Dialog not present");
+        }
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.name("q"))); // wait for the search panel to be visible
+        driver.findElement(By.xpath("//div[@class='O8ZS_U']/input")).sendKeys("iphones"); //write i phone and enter
+        driver.findElement(By.xpath("//div[@class='O8ZS_U']/input")).sendKeys(Keys.ENTER);
+
+        //click on low to high
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[contains(text(),'Price -- Low to High')]")));
+        driver.findElement(By.xpath("//div[contains(text(),'Price -- Low to High')]")).click();
+        Thread.sleep(5 * 1000);
+        List<WebElement> iphonesPrice = driver.findElements(By.xpath("//div[@class='_1vC4OE _2rQ-NK']"));
+        List<WebElement> iphoneName = driver.findElements(By.xpath("//div[@class='_3wU53n']"));
+        List<WebElement> rating=driver.findElements(By.xpath("//span[@class='_38sUEc']//span//span[1]"));
+        JavascriptExecutor jse = (JavascriptExecutor) driver;
+        jse.executeScript("window.scrollBy(0,950)", "");
+
+
+        String product_name;
+        String product_price = null;
+        String ratings = null;
+
+        Double double_product_price = 0.0;
+        HashMap<String, String> map_final_products = new HashMap<String, String>();
+        for (int i = 0; i < iphoneName.size(); i++) {
+            product_name = iphoneName.get(i).getText();//Iterate and fetch product name
+            product_price = iphonesPrice.get(i).getText();//Iterate and fetch product price
+            ratings=rating.get(i).getText(); // fetch rating
+
+            product_price = product_price.replaceAll("[^0-9]", "");
+            double_product_price = Double.parseDouble(product_price);//Convert to Integer
+            map_final_products.put(product_name, product_price);//Add product and price in HashMap
+
+            //Create CSV file in D drive
+            try {
+                PrintWriter file = new PrintWriter(new File("D:\\itemDetails.csv"));
+            } catch (Exception e) {
+                //handle exception
+            }
+
+
+            String eol = System.getProperty("line.separator");
+
+            try (Writer writer = new FileWriter("D:\\itemDetails.csv")) {
+                for (Map.Entry<String, String> keyValue : map_final_products.entrySet()) {
+                    writer.append(keyValue.getKey())
+                            .append(',')
+                            .append(keyValue.getValue())
+                            .append(eol);
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+            }
+
+        }
+    }
+
+
+
+    @AfterClass
+    public void closeBrowser() throws InterruptedException
+    {
+        Thread.sleep(2000);
+        driver.close();
+        driver.quit();
+    }
+}
