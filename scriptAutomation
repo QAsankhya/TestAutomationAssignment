@@ -1,6 +1,4 @@
 
-package com.ensimtest.tests.reseller;
-
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -30,6 +28,7 @@ public class NewPracticeClass {
     public void searchIphones() throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 40);
 
+        //if a pop up comes , cancel it
         try {
             wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@class='_2AkmmA _29YdH8']")));
             WebElement loginDialogCloseButton = driver.findElement(By.xpath("//button[@class='_2AkmmA _29YdH8']"));
@@ -37,8 +36,10 @@ public class NewPracticeClass {
         } catch (Exception e) {
             System.out.println("Login Dialog not present");
         }
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.name("q"))); // wait for the search panel to be visible
-        driver.findElement(By.xpath("//div[@class='O8ZS_U']/input")).sendKeys("iphones"); //write i phone and enter
+         // wait for the search panel to be visible
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.name("q")));
+         //write i phone and enter
+        driver.findElement(By.xpath("//div[@class='O8ZS_U']/input")).sendKeys("iphones");
         driver.findElement(By.xpath("//div[@class='O8ZS_U']/input")).sendKeys(Keys.ENTER);
 
         //click on low to high
@@ -59,9 +60,12 @@ public class NewPracticeClass {
         Double double_product_price = 0.0;
         HashMap<String, String> map_final_products = new HashMap<String, String>();
         for (int i = 0; i < iphoneName.size(); i++) {
-            product_name = iphoneName.get(i).getText();//Iterate and fetch product name
-            product_price = iphonesPrice.get(i).getText();//Iterate and fetch product price
-            ratings=rating.get(i).getText(); // fetch rating
+           //Iterate and fetch product name
+            product_name = iphoneName.get(i).getText();
+            //Iterate and fetch product price
+            product_price = iphonesPrice.get(i).getText();
+            // fetch rating
+            ratings=rating.get(i).getText(); 
 
             product_price = product_price.replaceAll("[^0-9]", "");
             double_product_price = Double.parseDouble(product_price);//Convert to Integer
